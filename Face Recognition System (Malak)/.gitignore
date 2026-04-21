@@ -1,0 +1,18 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+.venv/
+venv/
+ENV/
+
+# Data and Models (Large files or sensitive data)
+dataset/
+*.pkl
+*.h5
+
+# OS generated files
+.DS_Store
+Thumbs.db
