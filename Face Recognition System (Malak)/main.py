@@ -13,6 +13,7 @@ import face_recognition
 import numpy as np
 import pickle
 import threading
+import os
 import time
 from flask import Flask, request, jsonify, Response
 from anti_spoof import check_liveness
@@ -30,8 +31,17 @@ FLASK_PORT        = 5000
 # ═══════════════════════════════════════════════════════════════════════
 # Load encodings
 # ═══════════════════════════════════════════════════════════════════════
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+ENCODINGS_PATH = os.path.join(SCRIPT_DIR, "encodings.pkl")
+
 print("[BOOT] Loading encodings…")
-with open("encodings.pkl", "rb") as f:
+if not os.path.exists(ENCODINGS_PATH):
+    raise FileNotFoundError(
+        f"Missing encodings.pkl at: {ENCODINGS_PATH}\n"
+        f"Run: python \"{os.path.join(SCRIPT_DIR, 'encode_faces.py')}\" first (it generates encodings.pkl)."
+    )
+
+with open(ENCODINGS_PATH, "rb") as f:
     known_encodings, known_names = pickle.load(f)
 print(f"[BOOT] {len(known_encodings)} faces loaded for: {sorted(set(known_names))}")
 

@@ -8,8 +8,9 @@ import os
 import pickle
 import cv2
 
-DATASET_PATH = "dataset"
-OUTPUT_FILE  = "encodings.pkl"
+SCRIPT_DIR   = os.path.dirname(os.path.abspath(__file__))
+DATASET_PATH = os.path.join(SCRIPT_DIR, "dataset")
+OUTPUT_FILE  = os.path.join(SCRIPT_DIR, "encodings.pkl")
 
 known_encodings = []
 known_names     = []
