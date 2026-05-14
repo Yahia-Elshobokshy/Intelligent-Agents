@@ -1,6 +1,4 @@
 // lib/screens/settings/settings_screen.dart
-import 'package:flutter/services.dart';
-
 import '../../screens/admin/users_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,12 +13,10 @@ class SettingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // 1. Get the real user profile from Firestore
     final userProfileAsync = ref.watch(currentUserProvider);
     final userProfile = userProfileAsync.valueOrNull;
     final isAdmin = userProfile?.role == 'admin';
-    
-    // Get current user's PIN info (for ALL users)
+
     final currentPinAsync = ref.watch(currentUserPINProvider);
 
     return Scaffold(
@@ -41,11 +37,9 @@ class SettingsScreen extends ConsumerWidget {
         data: (user) => ListView(
           padding: const EdgeInsets.fromLTRB(20, 20, 20, 120),
           children: [
-            // 2. Dynamic Profile Card
             _buildUserProfile(user),
             const SizedBox(height: 32),
 
-            // 3. Admin-Only Sections
             if (isAdmin) ...[
               _buildSectionHeader('ACCESS CONTROL'),
               const SizedBox(height: 16),
@@ -65,7 +59,6 @@ class SettingsScreen extends ConsumerWidget {
               const SizedBox(height: 32),
             ],
 
-            // 4. PIN Section - FOR ALL USERS (members + admins)
             _buildSectionHeader('MY ACCESS PIN'),
             const SizedBox(height: 16),
             _buildPINCard(context, ref, currentPinAsync),
@@ -78,9 +71,7 @@ class SettingsScreen extends ConsumerWidget {
                 icon: Icons.home_work_rounded,
                 title: 'House ID',
                 subtitle: user?.houseId ?? 'Not Linked',
-                onTap: () {
-                  // Optional: Copy to clipboard logic
-                },
+                onTap: () {},
               ),
             ]),
             const SizedBox(height: 32),
@@ -91,7 +82,6 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  // NEW: PIN Card for all users
   Widget _buildPINCard(
     BuildContext context,
     WidgetRef ref,
@@ -130,7 +120,7 @@ class SettingsScreen extends ConsumerWidget {
         final isExpired = pin?.isExpired ?? true;
         final daysRemaining = pin?.daysRemaining ?? 0;
         final pinCode = pin?.pinCode ?? '----';
-        
+
         return Container(
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
@@ -143,7 +133,6 @@ class SettingsScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // PIN Display
               Center(
                 child: Column(
                   children: [
@@ -157,8 +146,8 @@ class SettingsScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      isExpired 
-                          ? 'EXPIRED' 
+                      isExpired
+                          ? 'EXPIRED'
                           : 'Expires in $daysRemaining days',
                       style: TextStyle(
                         fontSize: 12,
@@ -170,11 +159,10 @@ class SettingsScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 20),
-              // Generate New Button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
-                  onPressed: () => _showGeneratePinDialog(context, ref),
+                  onPressed: () => _generatePin(context, ref),
                   icon: const Icon(Icons.refresh),
                   label: const Text('GENERATE NEW PIN'),
                   style: ElevatedButton.styleFrom(
@@ -191,95 +179,15 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  // Dialog for generating new PIN
-  Future<void> _showGeneratePinDialog(BuildContext context, WidgetRef ref) async {
-    final shouldGenerate = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Generate New PIN'),
-        content: const Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.security_update_good, size: 48, color: AppTheme.primary),
-            SizedBox(height: 16),
-            Text('This will generate a new 4-digit PIN.'),
-            SizedBox(height: 8),
-            Text(
-              'Old PIN will expire immediately.',
-              style: TextStyle(fontSize: 12, color: AppTheme.grey600),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('CANCEL'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primary),
-            child: const Text('GENERATE', style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
-    );
-
-    if (shouldGenerate == true && context.mounted) {
-      try {
-        final newPin = await ref.read(pinServiceProvider).rotatePIN();
-        ref.invalidate(currentUserPINProvider);
-        
-        if (context.mounted) {
-          showDialog(
-            context: context,
-            builder: (ctx) => AlertDialog(
-              title: const Text('NEW PIN GENERATED'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text('Your new PIN is:'),
-                  const SizedBox(height: 16),
-                  Text(
-                    newPin,
-                    style: const TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 4,
-                      color: AppTheme.primary,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Valid for 14 days',
-                    style: TextStyle(fontSize: 12, color: AppTheme.grey600),
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Clipboard.setData(ClipboardData(text: newPin));
-                    Navigator.pop(ctx);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('PIN copied!')),
-                    );
-                  },
-                  child: const Text('COPY'),
-                ),
-                ElevatedButton(
-                  onPressed: () => Navigator.pop(ctx),
-                  child: const Text('OK'),
-                ),
-              ],
-            ),
-          );
-        }
-      } catch (e) {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
-          );
-        }
+  Future<void> _generatePin(BuildContext context, WidgetRef ref) async {
+    try {
+      await ref.read(pinServiceProvider).rotatePIN();
+      ref.invalidate(currentUserPINProvider);
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+        );
       }
     }
   }
@@ -406,7 +314,7 @@ class SettingsScreen extends ConsumerWidget {
       builder: (ctx) => AlertDialog(
         title: const Text('Confirm Logout'),
         content: const Text(
-          'Are you sure you want to sign out? This will clear your current session.',
+          'Are you sure you want to sign out?',
         ),
         actions: [
           TextButton(

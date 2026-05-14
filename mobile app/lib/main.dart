@@ -12,11 +12,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
-  );
-  
-  // 🔥 OPTIONAL: Uncomment to wipe ALL data on app start (DEBUG ONLY!)
-  // await wipeAllFirebaseData();
-  
+  );  
   runApp(const ProviderScope(child: MyApp()));
 }
 
