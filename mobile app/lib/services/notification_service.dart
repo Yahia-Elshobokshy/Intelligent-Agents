@@ -53,7 +53,7 @@ static Future<void> startListening() async {
   if (uid == null) return;
 
   final userDoc = await _firestore.collection('users').doc(uid).get();
-  final houseId = userDoc.data()?['houseId'];
+  final houseId = userDoc.data()?['house_id'];
   print('🔔 houseId found: $houseId');
   if (houseId == null) return;
 

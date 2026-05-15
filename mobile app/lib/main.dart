@@ -15,11 +15,13 @@ void main() async {
   await NotificationService.initialize();
 
   // Start listening once auth state is known
-  FirebaseAuth.instance.authStateChanges().listen((user) {
-    if (user != null) {
-      NotificationService.startListening();
-    }
-  });
+FirebaseAuth.instance.authStateChanges().listen((user) async {
+  if (user != null) {
+    // Wait for Firestore profile to be ready
+    await Future.delayed(const Duration(seconds: 2));
+    NotificationService.startListening();
+  }
+});
 
   runApp(const ProviderScope(child: MyApp()));
 }
