@@ -45,7 +45,10 @@ class LogTile extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 4,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       Text(
                         gateDisplay,
@@ -55,7 +58,6 @@ class LogTile extends StatelessWidget {
                           letterSpacing: 0.5
                         ),
                       ),
-                      const SizedBox(width: 8),
                       _buildActionBadge(),
                     ],
                   ),
