@@ -38,7 +38,7 @@ class GateCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // MQTT
     final gateService = ref.read(gateServiceProvider);
-    final mqtt = ref.read(mqttGateServiceProvider);
+    final mqtt = ref.watch(mqttGateServiceProvider);
     final user = ref.read(currentUserProvider).valueOrNull;
     final houseId = user?.houseId ?? '';
     final userName = user?.name ?? 'Unknown';
@@ -81,7 +81,10 @@ class GateCard extends ConsumerWidget {
                   child: ElevatedButton.icon(
                     
                     // MQTT
-                   onPressed: () => gateService.openGate(gate.id, houseId, mqtt, userName),
+                   onPressed: () async {
+                      if (!mqtt.isConnected) await mqtt.connect();
+                      gateService.openGate(gate.id, houseId, mqtt, userName);
+                    },
 
                     icon: const Icon(Icons.lock_open, size: 18),
                     label: const Text('Open'),
@@ -96,7 +99,10 @@ class GateCard extends ConsumerWidget {
                   child: ElevatedButton.icon(
 
                     // MQTT
-                   onPressed: () => gateService.closeGate(gate.id, houseId, mqtt, userName),
+                   onPressed: () async {
+                      if (!mqtt.isConnected) await mqtt.connect();
+                      gateService.closeGate(gate.id, houseId, mqtt, userName);
+                    },
 
                     icon: const Icon(Icons.lock, size: 18),
                     label: const Text('Close'),

@@ -230,7 +230,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
-  Widget _buildActionButton({required String label, required IconData icon, required Color color, required VoidCallback onPressed}) {
+  Widget _buildActionButton({
+    required String label,
+    required IconData icon,
+    required Color color,
+    required VoidCallback onPressed,
+  }) {
     return SizedBox(
       height: 54,
       child: ElevatedButton(
@@ -241,16 +246,22 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           padding: EdgeInsets.zero,
         ),
-        child: _isGlobalAction 
-          ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-          : Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(icon, size: 18),
-                const SizedBox(width: 8),
-                Flexible(child: FittedBox(child: Text(label, style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.5)))),
-              ],
-            ),
+        child: _isGlobalAction
+            ? const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+              )
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,  // ← add this
+                children: [
+                  Icon(icon, size: 18),
+                  const SizedBox(width: 8),
+                  Text(label, style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.5)),
+                  // ↑ removed Flexible + FittedBox — not needed in a fixed-height button
+                ],
+              ),
       ),
     );
   }

@@ -43,15 +43,13 @@ class LogTile extends StatelessWidget {
                     runSpacing: 4,
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
-                      Flexible(
-                        child: Text(
-                          gateDisplay,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w900, 
-                            fontSize: 13, 
-                            letterSpacing: 0.5
-                          ),
+                      Text(
+                        gateDisplay,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w900,
+                          fontSize: 13,
+                          letterSpacing: 0.5,
                         ),
                       ),
                       _buildActionBadge(),
