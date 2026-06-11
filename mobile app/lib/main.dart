@@ -7,7 +7,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'firebase_options.dart';
+<<<<<<< Updated upstream
 import 'package:ai_vision_gate/services/notification_service.dart';
+=======
+>>>>>>> Stashed changes
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,8 +29,11 @@ FirebaseAuth.instance.authStateChanges().listen((user) async {
   runApp(const ProviderScope(child: MyApp()));
 }
 
+<<<<<<< Updated upstream
 
 
+=======
+>>>>>>> Stashed changes
 // 🧹 Emergency wipe function - DEBUG ONLY!
 Future<void> wipeAllFirebaseData() async {
   print('⚠️ WARNING: Wiping all Firebase data...');
