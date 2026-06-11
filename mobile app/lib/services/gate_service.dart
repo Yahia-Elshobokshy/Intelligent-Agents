@@ -55,37 +55,49 @@ class GateService {
     await _gatesRef.doc(gateId).delete();
   }
 
-// MQTT Open Gate + write to firebase
-  Future<void> openGate(
-    String gateId,
-    String houseId,
-    MqttGateService mqtt,
-    String userName,
-  ) async {
-    mqtt.sendCommand(houseId, gateId, 'open');
-    await _db.collection('houses').doc(houseId).collection('access_logs').add({
-      'timestamp': FieldValue.serverTimestamp(),
-      'gate_id': gateId,
-      'action': 'open_via_remote',
-      'user_name': userName,
-    });
-  }
+Future<void> openGate(
+  String gateId,
+  String houseId,
+  MqttGateService mqtt,
+  String userName,
+) async {
+  mqtt.sendCommand(houseId, gateId, 'open');
+  
+  // Update status in Firestore so UI reflects the change
+  await _gatesRef.doc(gateId).update({
+    'status': 'open',
+    'last_updated': FieldValue.serverTimestamp(),
+  });
 
-// MQTT Close Gate + write to firebase
-  Future<void> closeGate(
-    String gateId,
-    String houseId,
-    MqttGateService mqtt,
-    String userName,
-  ) async {
-    mqtt.sendCommand(houseId, gateId, 'close');
-    await _db.collection('houses').doc(houseId).collection('access_logs').add({
-      'timestamp': FieldValue.serverTimestamp(),
-      'gate_id': gateId,
-      'action': 'close_via_remote',
-      'user_name': userName,
-    });
-  }
+  await _db.collection('houses').doc(houseId).collection('access_logs').add({
+    'timestamp': FieldValue.serverTimestamp(),
+    'gate_id': gateId,
+    'action': 'open_via_remote',
+    'user_name': userName,
+  });
+}
+
+Future<void> closeGate(
+  String gateId,
+  String houseId,
+  MqttGateService mqtt,
+  String userName,
+) async {
+  mqtt.sendCommand(houseId, gateId, 'close');
+
+  // Update status in Firestore so UI reflects the change
+  await _gatesRef.doc(gateId).update({
+    'status': 'locked',
+    'last_updated': FieldValue.serverTimestamp(),
+  });
+
+  await _db.collection('houses').doc(houseId).collection('access_logs').add({
+    'timestamp': FieldValue.serverTimestamp(),
+    'gate_id': gateId,
+    'action': 'close_via_remote',
+    'user_name': userName,
+  });
+}
 
   Future<void> openAllGates(List<String> gateIds) async {
     final batch = _db.batch();

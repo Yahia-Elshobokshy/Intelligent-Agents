@@ -4,6 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/otp.dart';
 import 'auth_service.dart';
+import 'package:mqtt_client/mqtt_client.dart';
+import 'package:mqtt_client/mqtt_server_client.dart';
+import '../../services/mqtt_gate_service.dart';
 
 final otpServiceProvider = Provider<OTPService>((ref) {
   // Pass the houseId reactively from the current user profile
@@ -52,36 +55,37 @@ class OTPService {
             .toList());
   }
 
-  Future<String> generateOTP(String gateId) async {
-    final code = _generate6DigitCode();
-    final now = DateTime.now();
-    final expiresAt = now.add(const Duration(minutes: 15));
-    final userEmail = _auth.currentUser?.email ?? 'unknown';
+  Future<String> generateOTP(String gateId, MqttGateService mqtt) async {
+  final code = _generate6DigitCode();
+  final now = DateTime.now();
+  final expiresAt = now.add(const Duration(minutes: 15));
+  final userEmail = _auth.currentUser?.email ?? 'unknown';
 
-    final docRef = _otpsRef.doc();
-    final otp = OTP(
-      id: docRef.id,
-      code: code,
-      gateId: gateId,
-      createdAt: now,
-      expiresAt: expiresAt,
-      used: false,
-      createdBy: userEmail,
-    );
+  final docRef = _otpsRef.doc();
+  final otp = OTP(
+    id: docRef.id,
+    code: code,
+    gateId: gateId,
+    createdAt: now,
+    expiresAt: expiresAt,
+    used: false,
+    createdBy: userEmail,
+  );
 
-    // Write OTP to house-isolated subcollection
-    await docRef.set(otp.toMap());
+  await docRef.set(otp.toMap());
 
-    // Write log to house-isolated subcollection
-    await _logsRef.add({
-      'timestamp': FieldValue.serverTimestamp(),
-      'gate_id': gateId,
-      'action': 'otp_generated',
-      'user_name': userEmail,
-    });
+  // Send MQTT open command to the same topic as gate_service
+  mqtt.sendCommand(houseId!, gateId, code);
 
-    return code;
-  }
+  await _logsRef.add({
+    'timestamp': FieldValue.serverTimestamp(),
+    'gate_id': gateId,
+    'action': 'otp_generated',
+    'user_name': userEmail,
+  });
+
+  return code;
+}
 
   String _generate6DigitCode() {
     final random = DateTime.now().microsecondsSinceEpoch % 1000000;

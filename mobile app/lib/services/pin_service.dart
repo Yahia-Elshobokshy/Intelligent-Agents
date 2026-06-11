@@ -4,13 +4,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'auth_service.dart';
 import '../models/user_pin.dart';
+import 'mqtt_gate_service.dart'; // ← add this
 
 final pinServiceProvider = Provider<PINService>((ref) => PINService(ref));
 
 final currentUserPINProvider = FutureProvider<UserPIN?>((ref) async {
   final user = ref.watch(currentUserProvider).valueOrNull;
   if (user?.houseId == null || user?.uid == null) return null;
-  // Auto-generates if missing or expired — always returns a valid PIN
   return ref.read(pinServiceProvider).getOrCreateCurrentUserPIN(user!.houseId!, user.uid);
 });
 
@@ -24,45 +24,42 @@ class PINService {
     return _db.collection('houses').doc(houseId).collection('user_pins');
   }
 
-  /// Fetches raw PIN doc without auto-generating.
   Future<UserPIN?> getCurrentUserPIN(String houseId, String userId) async {
     final doc = await _getPinsRef(houseId).doc(userId).get();
     if (!doc.exists) return null;
     return UserPIN.fromMap(userId, doc.data() as Map<String, dynamic>);
   }
 
-  /// 14-day rotation
   Future<UserPIN?> getOrCreateCurrentUserPIN(String houseId, String userId) async {
     final existing = await getCurrentUserPIN(houseId, userId);
-
     if (existing != null && !existing.isExpired && existing.isActive) {
-      return existing; 
+      return existing;
     }
-
-    // Expired, inactive, or never existed — generate a fresh PIN
-    final newPinCode = await _writePIN(houseId, userId);
+    await _writePIN(houseId, userId);
     return getCurrentUserPIN(houseId, userId);
   }
 
-  /// Rotates PIN for the CURRENT logged-in user (manual regeneration).
+  /// Rotates PIN for the CURRENT logged-in user — also publishes via MQTT.
   Future<String> rotatePIN() async {
     final userProfile = _ref.read(currentUserProvider).valueOrNull;
     if (userProfile == null) throw Exception("User not found");
     if (userProfile.houseId == null) throw Exception("No house linked");
 
-    return await _writePIN(userProfile.houseId!, userProfile.uid);
+    final mqtt = _ref.read(mqttGateServiceProvider);
+    return await _writePIN(userProfile.houseId!, userProfile.uid, mqtt: mqtt);
   }
 
-  /// Rotates PIN for a specific user (admin use).
+  /// Rotates PIN for a specific user (admin use) — also publishes via MQTT.
   Future<String> rotatePINForUser(String userId) async {
     final userProfile = _ref.read(currentUserProvider).valueOrNull;
     if (userProfile?.houseId == null) throw Exception("No house linked");
 
-    return await _writePIN(userProfile!.houseId!, userId);
+    final mqtt = _ref.read(mqttGateServiceProvider);
+    return await _writePIN(userProfile!.houseId!, userId, mqtt: mqtt);
   }
 
-  /// Internal: writes a new 4-digit PIN to Firestore and returns the code.
-  Future<String> _writePIN(String houseId, String userId) async {
+  /// Internal: writes a new 4-digit PIN, publishes it via MQTT, returns the code.
+  Future<String> _writePIN(String houseId, String userId, {MqttGateService? mqtt}) async {
     final newPin = (1000 + Random().nextInt(9000)).toString();
     final now = DateTime.now();
     final expiresAt = now.add(const Duration(days: 14));
@@ -74,6 +71,10 @@ class PINService {
       'is_active': true,
     });
 
+    // Publish PIN to MQTT so ESP32 keypad can validate it
+    // Topic: modules/gate/{userId}  payload: the 4-digit PIN
+    mqtt?.sendCommand(houseId, userId, newPin);
+
     return newPin;
   }
 
@@ -82,7 +83,6 @@ class PINService {
     if (userProfile?.houseId == null) throw Exception("No house linked");
 
     final existing = await getCurrentUserPIN(userProfile!.houseId!, userId);
-
     if (existing != null && !existing.isExpired && existing.isActive) {
       return existing.pinCode;
     }
@@ -90,7 +90,6 @@ class PINService {
     return await rotatePINForUser(userId);
   }
 
-  /// Admin: rotate ALL pins in house.
   Future<void> rotateAllHousePins() async {
     final userProfile = _ref.read(currentUserProvider).valueOrNull;
     if (userProfile?.houseId == null) throw Exception("No house linked");

@@ -9,6 +9,7 @@ import '../../models/otp.dart';
 import '../../core/app_theme.dart';
 import '../../services/gate_service.dart';
 import '../../models/gate.dart';
+import '../../services/mqtt_gate_service.dart';
 
 class OTPScreen extends ConsumerStatefulWidget {
   const OTPScreen({super.key});
@@ -23,31 +24,32 @@ class _OTPScreenState extends ConsumerState<OTPScreen> {
   bool _isGenerating = false;
   DateTime? _expiresAt;
 
-  Future<void> _generateOTP() async {
-    if (_selectedGateId == null) {
-      _showSnackBar('Select a terminal to authorize', AppTheme.secondary);
-      return;
+    Future<void> _generateOTP() async {
+      if (_selectedGateId == null) {
+        _showSnackBar('Select a terminal to authorize', AppTheme.secondary);
+        return;
+      }
+
+      setState(() => _isGenerating = true);
+
+      try {
+        final otpService = ref.read(otpServiceProvider);
+        final mqtt = ref.read(mqttGateServiceProvider); // ← add this
+        final code = await otpService.generateOTP(_selectedGateId!, mqtt); // ← pass it
+
+        setState(() {
+          _generatedCode = code;
+          _expiresAt = DateTime.now().add(const Duration(minutes: 15));
+        });
+
+        await Clipboard.setData(ClipboardData(text: code));
+        _showSnackBar('Access code copied to clipboard', AppTheme.primary);
+      } catch (e) {
+        _showSnackBar('System Error: $e', AppTheme.danger);
+      } finally {
+        if (mounted) setState(() => _isGenerating = false);
+      }
     }
-
-    setState(() => _isGenerating = true);
-
-    try {
-      final otpService = ref.read(otpServiceProvider);
-      final code = await otpService.generateOTP(_selectedGateId!);
-
-      setState(() {
-        _generatedCode = code;
-        _expiresAt = DateTime.now().add(const Duration(minutes: 15));
-      });
-
-      await Clipboard.setData(ClipboardData(text: code));
-      _showSnackBar('Access code copied to clipboard', AppTheme.primary);
-    } catch (e) {
-      _showSnackBar('System Error: $e', AppTheme.danger);
-    } finally {
-      if (mounted) setState(() => _isGenerating = false);
-    }
-  }
 
   void _showSnackBar(String message, Color color) {
     ScaffoldMessenger.of(
