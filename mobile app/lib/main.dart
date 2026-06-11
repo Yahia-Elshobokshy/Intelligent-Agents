@@ -1,6 +1,6 @@
 // lib/main.dart
 import 'package:ai_vision_gate/core/router.dart';
-import 'package:ai_vision_gate/services/mock_gate_controller.dart';
+import 'package:ai_vision_gate/services/mqtt_gate_service.dart'; // MQTT
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -54,13 +54,15 @@ class _MyAppState extends ConsumerState<MyApp> {
   void initState() {
     super.initState();
     Future.microtask(() {
-      ref.read(mockGateControllerProvider).startMocking();
+      // MQTT
+      ref.read(mqttGateServiceProvider).connect();
     });
   }
 
   @override
   void dispose() {
-    ref.read(mockGateControllerProvider).dispose();
+    // MQTT
+    ref.read(mqttGateServiceProvider).disconnect();
     super.dispose();
   }
 

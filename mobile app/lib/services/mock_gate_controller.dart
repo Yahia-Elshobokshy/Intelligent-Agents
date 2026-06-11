@@ -1,4 +1,4 @@
-// lib/services/mock_gate_controller.dart
+/* // lib/services/mock_gate_controller.dart
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
@@ -83,4 +83,4 @@ class MockGateController {
   void dispose() {
     _pollingTimer?.cancel();
   }
-}
+} */
