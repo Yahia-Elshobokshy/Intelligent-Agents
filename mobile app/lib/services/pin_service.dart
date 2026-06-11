@@ -31,14 +31,12 @@ class PINService {
     return UserPIN.fromMap(userId, doc.data() as Map<String, dynamic>);
   }
 
-  /// Always returns a valid PIN — auto-generates if missing or expired.
-  /// This is what [currentUserPINProvider] uses so the 14-day rotation
-  /// is fully automatic: no manual action required.
+  /// 14-day rotation
   Future<UserPIN?> getOrCreateCurrentUserPIN(String houseId, String userId) async {
     final existing = await getCurrentUserPIN(houseId, userId);
 
     if (existing != null && !existing.isExpired && existing.isActive) {
-      return existing; // Still valid, return as-is
+      return existing; 
     }
 
     // Expired, inactive, or never existed — generate a fresh PIN

@@ -2,16 +2,12 @@
 import 'package:flutter/material.dart';
 import '../models/access_log.dart';
 import '../core/app_theme.dart';
-
 class LogTile extends StatelessWidget {
   final AccessLog log;
   const LogTile({super.key, required this.log});
-
   @override
   Widget build(BuildContext context) {
-    // Dynamically display the gate name. If it's a custom name from Firestore, it shows that.
     final String gateDisplay = log.gateId.toUpperCase();
-
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -23,7 +19,6 @@ class LogTile extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-            // Status Icon: Changes color based on whether it was an 'open' or 'close' action
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
@@ -39,8 +34,6 @@ class LogTile extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 16),
-            
-            // Log Content
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -50,12 +43,15 @@ class LogTile extends StatelessWidget {
                     runSpacing: 4,
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
-                      Text(
-                        gateDisplay,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w900, 
-                          fontSize: 13, 
-                          letterSpacing: 0.5
+                      Flexible(
+                        child: Text(
+                          gateDisplay,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w900, 
+                            fontSize: 13, 
+                            letterSpacing: 0.5
+                          ),
                         ),
                       ),
                       _buildActionBadge(),
@@ -73,8 +69,6 @@ class LogTile extends StatelessWidget {
                 ],
               ),
             ),
-
-            // Time Info
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
@@ -93,7 +87,6 @@ class LogTile extends StatelessWidget {
       ),
     );
   }
-
   Widget _buildActionBadge() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),

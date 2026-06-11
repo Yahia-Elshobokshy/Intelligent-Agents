@@ -55,14 +55,12 @@ class AdminService {
     }
   }
 
-  // ✅ FIXED: This method name matches what users_screen.dart calls
   Future<void> deleteUser(String userId) async {
     await _db.collection('users').doc(userId).update({
       'house_id': null,
       'role': 'member',
     });
     
-    // Also delete their PIN from the house
     if (houseId != null) {
       await _db
           .collection('houses')

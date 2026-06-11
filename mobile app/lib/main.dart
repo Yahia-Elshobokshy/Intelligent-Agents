@@ -10,7 +10,6 @@ import 'firebase_options.dart';
 import 'package:ai_vision_gate/services/notification_service.dart';
 
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -28,9 +27,9 @@ FirebaseAuth.instance.authStateChanges().listen((user) async {
   runApp(const ProviderScope(child: MyApp()));
 }
 
-// 🧹 Emergency wipe function - DEBUG ONLY!
+// Emergency wipe function - DEBUG ONLY!
 Future<void> wipeAllFirebaseData() async {
-  print('⚠️ WARNING: Wiping all Firebase data...');
+  print('WARNING: Wiping all Firebase data...');
   
   // 1. Delete all users
   final auth = FirebaseAuth.instance;
@@ -48,10 +47,10 @@ Future<void> wipeAllFirebaseData() async {
     for (final doc in snapshot.docs) {
       await doc.reference.delete();
     }
-    print('✅ Deleted collection: $collection');
+    print('Deleted collection: $collection');
   }
   
-  print('✅ All Firebase data wiped!');
+  print('All Firebase data wiped!');
 }
 
 class MyApp extends ConsumerStatefulWidget {

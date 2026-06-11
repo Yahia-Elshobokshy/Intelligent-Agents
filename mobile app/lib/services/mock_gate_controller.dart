@@ -16,7 +16,7 @@ class MockGateController {
     _pollingTimer = Timer.periodic(const Duration(seconds: 2), (timer) async {
       await _checkAndExecuteCommands();
     });
-    debugPrint('✅ Mock ESP32 controller started');
+    debugPrint('Mock ESP32 controller started');
   }
 
   Future<void> _checkAndExecuteCommands() async {
@@ -62,7 +62,7 @@ class MockGateController {
             'last_updated': FieldValue.serverTimestamp(),
           });
           
-          debugPrint('✅ Gate ${gateDoc.id} status changed to $newStatus');
+          debugPrint('Gate ${gateDoc.id} status changed to $newStatus');
           
           // Log to house-specific logs
           await FirebaseFirestore.instance

@@ -44,7 +44,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       final authState = ref.read(authStateProvider);
       final profileAsync = ref.read(currentUserProvider);
       
-      print('🔀 ROUTER: Checking redirect...');
+      print('ROUTER: Checking redirect...');
       print('   authState: ${authState.valueOrNull?.uid ?? 'null'}');
       print('   profileAsync: ${profileAsync.valueOrNull?.uid ?? 'null'}');
       print('   profileAsync loading: ${profileAsync.isLoading}');
@@ -56,7 +56,7 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // CASE 1: Auth is still loading → wait
       if (authState.isLoading) {
-        print('   ⏳ Auth loading, waiting...');
+        print('   Auth loading, waiting...');
         return null;
       }
 
@@ -64,21 +64,20 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // CASE 2: No user → go to login
       if (user == null) {
-        print('   ❌ No user, redirecting to /login');
+        print('   No user, redirecting to /login');
         if (isOnLogin || isOnRegister) return null;
         return '/login';
       }
 
       // CASE 3: User exists but profile is STILL LOADING → wait (DON'T sign out!)
       if (profileAsync.isLoading) {
-        print('   ⏳ Profile still loading, waiting...');
+        print('   Profile still loading, waiting...');
         return null;
       }
 
       // CASE 4: Profile failed to load (error)
       if (profileAsync.hasError) {
-        print('   ❌ Profile error: ${profileAsync.error}');
-        // Don't sign out automatically, just wait or show error
+        print('   Profile error: ${profileAsync.error}');
         return null;
       }
 
@@ -86,30 +85,23 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // CASE 5: User exists but NO profile document found → This is the problem!
       if (profile == null) {
-        print('   ⚠️ User exists but NO Firestore profile!');
-        print('   ⚠️ This should not happen - profile should be created on signup');
-        // Instead of signing out, show an error dialog
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          // Navigate to an error screen or show snackbar
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Profile not found. Please contact support.'), backgroundColor: Colors.red),
-          );
-        });
-        return null; // Stay where you are
+        print('   User exists but NO Firestore profile!');
+        print('   This should not happen - profile should be created on signup');
+        return null; 
       }
 
       // CASE 6: Logged in but no house linked → force setup
       final hasNoHouse = profile.houseId == null || profile.houseId!.trim().isEmpty;
       if (hasNoHouse) {
-        print('   🏠 No house linked (houseId: ${profile.houseId}), redirecting to /setup');
+        print('   No house linked (houseId: ${profile.houseId}), redirecting to /setup');
         if (isOnSetup) return null;
         return '/setup';
       }
 
       // CASE 7: Fully set up → go to home
-      print('   ✅ Fully set up, user: ${profile.name}, house: ${profile.houseId}');
+      print('   Fully set up, user: ${profile.name}, house: ${profile.houseId}');
       if (isOnSetup || isOnLogin || isOnRegister) {
-        print('   ➡️ Redirecting to /');
+        print('   Redirecting to /');
         return '/';
       }
 
