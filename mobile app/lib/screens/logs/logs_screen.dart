@@ -31,7 +31,6 @@ class LogsScreen extends ConsumerWidget {
           if (logs.isEmpty) return const Center(child: Text('No activity.'));
 
           return ListView.builder(
-            // The bottom padding (120) ensures the last item stops BEFORE the Nav Bar
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 120),
             itemCount: logs.length,
             itemBuilder: (context, index) {

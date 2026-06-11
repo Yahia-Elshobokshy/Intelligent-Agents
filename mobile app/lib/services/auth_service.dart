@@ -36,7 +36,6 @@ class AuthService {
   Future<UserCredential> signIn(String email, String password) {
     return _auth.signInWithEmailAndPassword(email: email, password: password);
   }
-  // lib/services/auth_service.dart - Update signUp method
 
   Future<UserCredential> signUp({
     required String email,
@@ -67,17 +66,15 @@ class AuthService {
     // Write to Firestore
     await _db.collection('users').doc(user.uid).set(appUser.toMap());
 
-    // 🔥 CRITICAL: Wait for Firestore to acknowledge the write
     // This ensures the document exists before the stream picks it up
     await Future.delayed(const Duration(milliseconds: 500));
 
-    // 🔥 Also trigger a manual refresh of the user's profile
-    // Force the stream to re-emit
+    // Force the stream to re-emit (manual refresh)
     final docSnapshot = await _db.collection('users').doc(user.uid).get();
     if (docSnapshot.exists) {
-      print('✅ Profile confirmed in Firestore for ${user.email}');
+      print('Profile confirmed in Firestore for ${user.email}');
     } else {
-      print('⚠️ Profile not found immediately after write!');
+      print('Profile not found immediately after write!');
     }
 
     return userCredential;

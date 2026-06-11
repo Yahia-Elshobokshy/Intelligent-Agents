@@ -21,10 +21,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   bool _isLoading = false;
   String? _error;
 
-  // lib/screens/auth/register_screen.dart - Update _register method
-
   Future<void> _register() async {
-    // Validation
     if (_nameController.text.trim().isEmpty) {
       setState(() => _error = 'Please enter your name');
       return;
@@ -65,11 +62,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             name: _nameController.text.trim(),
           );
 
-      print('✅ Registration complete, router should handle navigation');
+      print('Registration complete, router should handle navigation');
 
       if (mounted) {
-        // DON'T show any dialog - let the router redirect naturally
-        // The router will send them to /setup
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Account created! Please set up your house.'),

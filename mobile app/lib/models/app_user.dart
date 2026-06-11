@@ -34,7 +34,7 @@ class AppUser {
       'role': role,
       'created_at': Timestamp.fromDate(createdAt),
       'is_verified': isVerified,
-      'house_id': houseId, // Matches Firestore
+      'house_id': houseId,
     };
   }
 
@@ -48,7 +48,7 @@ class AppUser {
       role: map['role'] ?? 'member',
       createdAt: (map['created_at'] as Timestamp?)?.toDate() ?? DateTime.now(),
       isVerified: map['is_verified'] ?? false,
-      houseId: map['house_id'], // CRITICAL: This must match what you save in setup
+      houseId: map['house_id'], 
     );
   }
 }

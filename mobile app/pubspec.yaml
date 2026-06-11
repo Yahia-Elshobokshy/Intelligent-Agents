@@ -41,6 +41,7 @@ dependencies:
 
   # Notifications
   # flutter_local_notifications: ^18.0.1
+  mqtt_client: ^10.2.1
 
   # Navigation
   go_router: ^15.1.2

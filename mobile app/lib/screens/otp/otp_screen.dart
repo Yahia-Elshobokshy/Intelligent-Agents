@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:share_plus/share_plus.dart'; 
+import 'package:share_plus/share_plus.dart';
 import '../../services/otp_service.dart';
 import '../../models/otp.dart';
 import '../../core/app_theme.dart';
@@ -50,9 +50,9 @@ class _OTPScreenState extends ConsumerState<OTPScreen> {
   }
 
   void _showSnackBar(String message, Color color) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: color)
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message), backgroundColor: color));
   }
 
   @override
@@ -87,9 +87,13 @@ class _OTPScreenState extends ConsumerState<OTPScreen> {
           ),
           const SizedBox(height: 16),
           gatesAsync.when(
-            data: (gates) => gates.isEmpty 
-              ? const Center(child: Text("No gates found in your house."))
-              : Column(children: gates.map((gate) => _buildTerminalCard(gate)).toList()),
+            data: (gates) => gates.isEmpty
+                ? const Center(child: Text("No gates found in your house."))
+                : Column(
+                    children: gates
+                        .map((gate) => _buildTerminalCard(gate))
+                        .toList(),
+                  ),
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (e, _) => Text('Error loading terminals: $e'),
           ),
@@ -126,17 +130,29 @@ class _OTPScreenState extends ConsumerState<OTPScreen> {
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-color: isSelected ? AppTheme.primary.withValues(alpha: 0.05) : Colors.white,            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: isSelected ? AppTheme.primary : AppTheme.grey200),
+            color: isSelected
+                ? AppTheme.primary.withValues(alpha: 0.05)
+                : Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isSelected ? AppTheme.primary : AppTheme.grey200,
+            ),
           ),
           child: Row(
             children: [
               Icon(
-                isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
+                isSelected
+                    ? Icons.radio_button_checked
+                    : Icons.radio_button_off,
                 color: isSelected ? AppTheme.primary : AppTheme.grey400,
               ),
               const SizedBox(width: 12),
-              Text(gate.name, style: TextStyle(fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
+              Text(
+                gate.name,
+                style: TextStyle(
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
             ],
           ),
         ),
@@ -151,7 +167,9 @@ color: isSelected ? AppTheme.primary.withValues(alpha: 0.05) : Colors.white,    
       child: ElevatedButton(
         onPressed: _isGenerating ? null : _generateOTP,
         style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primary),
-        child: _isGenerating ? const CircularProgressIndicator(color: Colors.white) : const Text('GENERATE ACCESS CODE'),
+        child: _isGenerating
+            ? const CircularProgressIndicator(color: Colors.white)
+            : const Text('GENERATE ACCESS CODE'),
       ),
     );
   }
@@ -167,7 +185,14 @@ color: isSelected ? AppTheme.primary.withValues(alpha: 0.05) : Colors.white,    
       ),
       child: Column(
         children: [
-          Text(_generatedCode!, style: const TextStyle(fontSize: 42, fontWeight: FontWeight.bold, letterSpacing: 6)),
+          Text(
+            _generatedCode!,
+            style: const TextStyle(
+              fontSize: 42,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 6,
+            ),
+          ),
           const SizedBox(height: 16),
           if (_expiresAt != null) _CountdownTimer(expiresAt: _expiresAt!),
           const SizedBox(height: 24),
@@ -175,13 +200,15 @@ color: isSelected ? AppTheme.primary.withValues(alpha: 0.05) : Colors.white,    
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               OutlinedButton.icon(
-                onPressed: () => Clipboard.setData(ClipboardData(text: _generatedCode!)),
+                onPressed: () =>
+                    Clipboard.setData(ClipboardData(text: _generatedCode!)),
                 icon: const Icon(Icons.copy),
                 label: const Text('COPY'),
               ),
               const SizedBox(width: 12),
               OutlinedButton.icon(
-                onPressed: () => Share.share("Gate Access Code: $_generatedCode"),
+                onPressed: () =>
+                    Share.share("Gate Access Code: $_generatedCode"),
                 icon: const Icon(Icons.share),
                 label: const Text('SHARE'),
               ),
@@ -195,12 +222,19 @@ color: isSelected ? AppTheme.primary.withValues(alpha: 0.05) : Colors.white,    
   Widget _buildInfoBanner() {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: AppTheme.grey200)),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppTheme.grey200),
+      ),
       child: const Row(
         children: [
           Icon(Icons.security, color: AppTheme.primary),
           SizedBox(width: 12),
-          Text("Codes valid for 15 minutes", style: TextStyle(color: AppTheme.grey600)),
+          Text(
+            "Codes valid for 15 minutes",
+            style: TextStyle(color: AppTheme.grey600),
+          ),
         ],
       ),
     );
@@ -216,7 +250,7 @@ class _ActiveOTPsList extends ConsumerWidget {
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => Text('Error: $e'),
       data: (otps) => ListView.builder(
-        shrinkWrap: true, // Fixes Overflow inside ScrollView
+        shrinkWrap: true, 
         physics: const NeverScrollableScrollPhysics(),
         itemCount: otps.length,
         itemBuilder: (context, index) => _ActiveOtpTile(otp: otps[index]),
@@ -233,14 +267,21 @@ class _ActiveOtpTile extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: AppTheme.grey200)),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppTheme.grey200),
+      ),
       child: Row(
         children: [
           const Icon(Icons.key, color: AppTheme.grey400),
           const SizedBox(width: 12),
           Text(otp.code, style: const TextStyle(fontWeight: FontWeight.bold)),
           const Spacer(),
-          Text('${otp.timeRemaining.inMinutes}m left', style: const TextStyle(color: AppTheme.primary, fontSize: 12)),
+          Text(
+            '${otp.timeRemaining.inMinutes}m left',
+            style: const TextStyle(color: AppTheme.primary, fontSize: 12),
+          ),
         ],
       ),
     );
@@ -263,17 +304,26 @@ class _CountdownTimerState extends State<_CountdownTimer> {
     super.initState();
     _timeLeft = widget.expiresAt.difference(DateTime.now());
     _timer = Timer.periodic(const Duration(seconds: 1), (t) {
-      if (mounted) setState(() => _timeLeft = widget.expiresAt.difference(DateTime.now()));
+      if (mounted)
+        setState(() => _timeLeft = widget.expiresAt.difference(DateTime.now()));
     });
   }
 
   @override
-  void dispose() { _timer.cancel(); super.dispose(); }
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final seconds = _timeLeft.inSeconds % 60;
-    return Text("EXPIRES IN ${_timeLeft.inMinutes}:${seconds.toString().padLeft(2, '0')}", 
-      style: const TextStyle(color: AppTheme.secondary, fontWeight: FontWeight.bold));
+    return Text(
+      "EXPIRES IN ${_timeLeft.inMinutes}:${seconds.toString().padLeft(2, '0')}",
+      style: const TextStyle(
+        color: AppTheme.secondary,
+        fontWeight: FontWeight.bold,
+      ),
+    );
   }
 }

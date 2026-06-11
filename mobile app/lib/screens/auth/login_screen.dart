@@ -16,9 +16,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   bool _loading = false;
   String? _error;
   
-  // In login_screen.dart, modify the _signIn method:
   Future<void> _signIn() async {
-    print('🔥 SIGN IN TAPPED: ${_emailController.text}');
+    print('SIGN IN TAPPED: ${_emailController.text}');
     setState(() {
       _loading = true;
       _error = null;
@@ -30,18 +29,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             _emailController.text.trim(),
             _passwordController.text.trim(),
           );
-      print('✅ SIGN IN SUCCESS');
+      print('SIGN IN SUCCESS');
 
       // Wait a moment and check the profile
       await Future.delayed(const Duration(milliseconds: 500));
       final profile = ref.read(currentUserProvider).valueOrNull;
       print(
-        '📱 Profile after sign-in: ${profile?.uid}, houseId: ${profile?.houseId}',
+        'Profile after sign-in: ${profile?.uid}, houseId: ${profile?.houseId}',
       );
 
       // The router should handle navigation automatically
     } catch (e) {
-      print('❌ SIGN IN ERROR: $e');
+      print('SIGN IN ERROR: $e');
       if (mounted) {
         setState(() {
           _error = 'Invalid email or password';
@@ -112,14 +111,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     ? const CircularProgressIndicator()
                     : const Text('Sign In'),
               ),
-              // Add to login_screen.dart bottom:
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text("Don't have an account?"),
-                  // Change the "Sign Up" button at the bottom to use GoRouter:
                   TextButton(
-                    onPressed: () => context.go('/register'), // Much cleaner!
+                    onPressed: () => context.go('/register'), 
                     child: const Text('Sign Up'),
                   ),
                 ],

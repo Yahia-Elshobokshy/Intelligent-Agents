@@ -6,7 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'firebase_options.dart';
+import 'core/firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,9 +16,9 @@ void main() async {
   runApp(const ProviderScope(child: MyApp()));
 }
 
-// 🧹 Emergency wipe function - DEBUG ONLY!
+// Emergency wipe function - DEBUG ONLY!
 Future<void> wipeAllFirebaseData() async {
-  print('⚠️ WARNING: Wiping all Firebase data...');
+  print('WARNING: Wiping all Firebase data...');
   
   // 1. Delete all users
   final auth = FirebaseAuth.instance;
@@ -36,10 +36,10 @@ Future<void> wipeAllFirebaseData() async {
     for (final doc in snapshot.docs) {
       await doc.reference.delete();
     }
-    print('✅ Deleted collection: $collection');
+    print('Deleted collection: $collection');
   }
   
-  print('✅ All Firebase data wiped!');
+  print('All Firebase data wiped!');
 }
 
 class MyApp extends ConsumerStatefulWidget {

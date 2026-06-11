@@ -7,6 +7,9 @@ import '../../widgets/gate_card.dart';
 import '../../models/gate.dart';
 import '../../core/app_theme.dart';
 
+
+const String _streamUrl = 'http://placeholder-stream';
+
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
 

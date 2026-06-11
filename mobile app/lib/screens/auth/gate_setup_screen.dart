@@ -1,5 +1,4 @@
 // lib/screens/auth/gate_setup_screen.dart
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/app_theme.dart';
@@ -9,11 +8,11 @@ import 'package:go_router/go_router.dart';
 class GateSetupScreen extends ConsumerWidget {
   const GateSetupScreen({super.key});
 
-  String _generateHouseId() {
+/*   String _generateHouseId() {
     final random = Random();
     final id = 10000000 + random.nextInt(90000000);
     return 'HSE-$id';
-  }
+  } */
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -84,22 +83,15 @@ class GateSetupScreen extends ConsumerWidget {
       ),
     );
   }
-  // lib/screens/auth/gate_setup_screen.dart
-  // lib/screens/auth/gate_setup_screen.dart
-  // Fix _handleCreateHouse method:
 
   Future<void> _handleCreateHouse(BuildContext context, WidgetRef ref) async {
     final messenger = ScaffoldMessenger.of(context);
-    final router = GoRouter.of(context);
 
     try {
       await ref.read(authServiceProvider).createHouse("Home");
-
-      // Force refresh
       ref.invalidate(currentUserProvider);
 
       if (context.mounted) {
-        // Use go instead of router.go for consistency
         context.go('/');
         messenger.showSnackBar(
           const SnackBar(content: Text('House created successfully!')),
@@ -113,8 +105,6 @@ class GateSetupScreen extends ConsumerWidget {
       }
     }
   }
-  // lib/screens/auth/gate_setup_screen.dart
-  // Fix the _showJoinDialog method:
 
   void _showJoinDialog(BuildContext context, WidgetRef ref) {
     final controller = TextEditingController();
@@ -137,11 +127,8 @@ class GateSetupScreen extends ConsumerWidget {
           ElevatedButton(
             onPressed: () async {
               final code = controller.text.trim();
-              Navigator.pop(ctx); // Close dialog FIRST
-
-              // Small delay to allow dialog to close
+              Navigator.pop(ctx); 
               await Future.delayed(const Duration(milliseconds: 100));
-
               final success = await ref
                   .read(authServiceProvider)
                   .joinHouse(code);
@@ -151,8 +138,7 @@ class GateSetupScreen extends ConsumerWidget {
                 ref.invalidate(currentUserProvider);
 
                 if (context.mounted) {
-                  // Use go_router's go method instead of Navigator
-                  context.go('/'); // This will trigger router redirect
+                  context.go('/'); 
 
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Successfully joined house!')),

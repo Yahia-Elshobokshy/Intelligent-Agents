@@ -25,7 +25,7 @@ class _DebugPanelState extends State<DebugPanel> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Text('🐛 DEBUG', style: TextStyle(color: Colors.green[300], fontSize: 12)),
+          Text('DEBUG', style: TextStyle(color: Colors.green[300], fontSize: 12)),
           _DebugButton(
             label: 'Test Notification',
             onTap: () async {

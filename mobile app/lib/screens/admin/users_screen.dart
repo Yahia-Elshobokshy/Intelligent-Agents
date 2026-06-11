@@ -9,7 +9,6 @@ class UsersScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Watching the real stream from Firestore
     final usersAsync = ref.watch(allUsersProvider);
 
     return Scaffold(

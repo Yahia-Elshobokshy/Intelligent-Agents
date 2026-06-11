@@ -20,19 +20,18 @@ class AccessLog {
     return AccessLog(
       id: id,
       timestamp: (map['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
-      userName: map['user_name'] ?? 'Unknown User', // This fixes point 10
+      userName: map['user_name'] ?? 'Unknown User', 
       action: map['action'] ?? 'accessed gate',
       gateId: map['gate_id'] ?? 'Gate',
     );
   }
 
-  // THIS IS THE MISSING PIECE CAUSING YOUR ERROR
   Color get actionColor {
     final act = action.toLowerCase();
     if (act.contains('open')) return Colors.green;
     if (act.contains('close')) return Colors.orange;
     if (act.contains('denied')) return Colors.red;
-    return Colors.blue; // Default color
+    return Colors.blue; 
   }
 
   String get formattedTime {
