@@ -38,7 +38,10 @@ class LogTile extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 4,
+                    crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       Flexible(
                         child: Text(
@@ -51,7 +54,6 @@ class LogTile extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 8),
                       _buildActionBadge(),
                     ],
                   ),

@@ -19,6 +19,9 @@ dependencies:
   firebase_storage: ^12.4.5
 
   # MQTT
+  flutter_local_notifications: ^17.0.0
+  # Notifications
+  # flutter_local_notifications: ^18.0.1
   mqtt_client: ^10.2.1
 
   # Navigation

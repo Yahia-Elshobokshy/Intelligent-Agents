@@ -6,7 +6,8 @@ import 'dashboard/dashboard_screen.dart';
 import 'otp/otp_screen.dart';
 import 'logs/logs_screen.dart';
 import 'settings/settings_screen.dart';
-import 'intercom/intercom_screen.dart';          
+import 'intercom/intercom_screen.dart';          // ← new
+
 
 class MainNavigationScreen extends ConsumerStatefulWidget {
   const MainNavigationScreen({super.key});
@@ -23,7 +24,7 @@ class _MainNavigationScreenState
   final List<Widget> _screens = const [
     DashboardScreen(),
     OTPScreen(),
-    IntercomScreen(),    
+    IntercomScreen(),     
     LogsScreen(),
     SettingsScreen(),
   ];
@@ -69,7 +70,7 @@ class _MainNavigationScreenState
           children: [
             _navItem(0, Icons.grid_view_rounded,      'Home'),
             _navItem(1, Icons.vpn_key_rounded,         'Access'),
-            _navItem(2, Icons.videocam_rounded,        'Intercom'),  
+            _navItem(2, Icons.videocam_rounded,        'Intercom'),  // ← new
             _navItem(3, Icons.assignment_rounded,      'Logs'),
             _navItem(4, Icons.manage_accounts_rounded, 'Setup'),
           ],

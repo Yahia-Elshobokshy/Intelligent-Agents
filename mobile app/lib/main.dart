@@ -6,13 +6,24 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'core/firebase_options.dart';
+import 'firebase_options.dart';
+import 'package:ai_vision_gate/services/notification_service.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );  
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await NotificationService.initialize();
+
+  // Start listening once auth state is known
+FirebaseAuth.instance.authStateChanges().listen((user) async {
+  if (user != null) {
+    // Wait for Firestore profile to be ready
+    await Future.delayed(const Duration(seconds: 2));
+    NotificationService.startListening();
+  }
+});
+
   runApp(const ProviderScope(child: MyApp()));
 }
 
